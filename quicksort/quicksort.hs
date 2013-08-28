@@ -6,4 +6,5 @@ quicksort (pivot:xs) = (quicksort lesser) ++ [pivot] ++ (quicksort greater)
         greater = filter (>= pivot) xs
         
     
-    
+main = 
+    print (quicksort [1 ,  2 ,  4 ,  5 ,  10])

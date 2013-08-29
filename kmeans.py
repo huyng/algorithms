@@ -1,8 +1,10 @@
 import random
 import numpy
 
-@profile
 def KmeansCluster(X, k, t=.0000001, max_iter=100):
+    """
+    kmeans written c-style
+    """
     # random initialization of centroids
     n = len(X[0])
     m = len(X)
@@ -23,7 +25,7 @@ def KmeansCluster(X, k, t=.0000001, max_iter=100):
         for i in xrange(m):
             min_d = 99999999
             for j in xrange(k):
-                cdef intd = 0
+                d = 0
                 for l in xrange(n):
                     d += abs(centroids[j][l] - X[i][l])
                 if d < min_d:
@@ -54,6 +56,8 @@ if __name__ == '__main__':
     pt1 = numpy.random.normal(1, 0.2, (2000,2))
     pt2 = numpy.random.normal(2, 0.5, (3000,2))
     pt3 = numpy.random.normal(3, 0.3, (1000,2))
+    pt3[:,0] += 3.5
+    pt1[:,1] -= 2.5
     X = numpy.concatenate((pt1, pt2, pt3))
     idx = KmeansCluster(X, k=3)
     colors = ([([0.4,1,0.4],[1,0.4,0.4],[0.1,0.8,1])[i] for i in idx])

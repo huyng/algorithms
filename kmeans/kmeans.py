@@ -53,12 +53,7 @@ def KmeansCluster(X, k, t=.0000001, max_iter=100):
 
 if __name__ == '__main__':
     from matplotlib import pyplot as plt
-    pt1 = numpy.random.normal(1, 0.2, (2000,2))
-    pt2 = numpy.random.normal(2, 0.5, (3000,2))
-    pt3 = numpy.random.normal(3, 0.3, (1000,2))
-    pt3[:,0] += 3.5
-    pt1[:,1] -= 2.5
-    X = numpy.concatenate((pt1, pt2, pt3))
+    X = numpy.loadtxt("data.csv",delimiter=",")
     idx = KmeansCluster(X, k=3)
     colors = ([([0.4,1,0.4],[1,0.4,0.4],[0.1,0.8,1])[i] for i in idx])
     plt.scatter(X[:,0], X[:,1], c=colors)

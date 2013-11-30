@@ -1,0 +1,5 @@
+- scipy weave
+- python for loop based
+- cython
+- c++ sliding patches
+- 

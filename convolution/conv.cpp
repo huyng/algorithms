@@ -6,30 +6,30 @@
 extern "C" {
 
 // Extract overlapping patches as flattened arrays 
-// from `im` into `patches`. This function is modeled
+// from `feats` into `patches`. This function is modeled
 // after matlab's im2col function.
 // 
 // 
 // Parameters
 // ----------
 // 
-// im:
+// feats:
 //      pointer to array of type T[n_rows][n_cols][n_dpth]
 // patches:
 //      pointer to array of type T[p_rows][p_cols][p_size*p_size*n_dpth]
 // n_rows:
-//      number of rows in im
+//      number of rows in feats
 // n_cols:
-//      number of cols in im
+//      number of cols in feats
 // n_dpth:
-//      number of channels in im
+//      number of channels in feats
 // p_size:
 //      the edge size of the square patch
 // p_strd:
 //      the "stride" or amount to move patches by when sliding
 //      
 void sliding_patches (
-        const float* im,
+        const float* feats,
         float* patches,
         const int n_rows,
         const int n_cols,
@@ -66,13 +66,13 @@ void sliding_patches (
         // iterate over patch columns
         for (int idx_c = 0; idx_c < p_cols; ++idx_c) {
 
-            // copy im[wnd_top:wnd_btm, wnd_lft:wnd_rht, :]
+            // copy feats[wnd_top:wnd_btm, wnd_lft:wnd_rht, :]
             int wnd_top = idx_r * p_strd;
             int wnd_btm = wnd_top + p_size;
             int wnd_lft = idx_c * p_strd;
             int wnd_rht = wnd_lft * p_size;
 
-            const float* ptr_im = im + (wnd_top * n_cols + wnd_lft) * n_dpth;
+            const float* ptr_im = feats + (wnd_top * n_cols + wnd_lft) * n_dpth;
             for (int i = wnd_top; i < wnd_btm; ++i) {
                 
                 // copy one patch row worth of image data into

@@ -20,14 +20,17 @@ class TSNE(object):
         pass
 
     def fit(self, X):
-
         # p_ji a.k.a the pairwise affinity
+        def similarity(x1, x2, d, s): 
+            return np.exp(-1.0*d(x1,x2)**2/(2*s**2)
+        def d(x1,x2):
+            return x1-x2
         for i in range(X.shape[0])
             xi = X[i]
-            sigma = 2*np.square(sigma)
             for j in range(X.shape[0]):
                 xj = X[j]
-                numer = np.exp(-1.0 * l2_sqr(xi, xj)/sigma)
+                dist = lambda x1,x2: 
+                numer = similarity(xi, xj, )
                 denom = 0
                 for k in range(X.shape[0]):
                     if k == i:

@@ -7,6 +7,19 @@ def l2_sqr(x1, x2):
     norm_squared = np.sum(np.square(x1 - x2))
     return norm_squared
 
+def scale_features(X):
+    """
+    center features around zero mean and scale features
+    """
+    m, n = X.shape
+    s = X.sum(axis=0)
+    mu = s/float(m)
+    Y = X - mu
+    ymax = np.max(Y, axis=0)
+    ymin = np.min(Y, axis=0)
+    ydiff = ymax - ymin
+    Y = Y/ydiff
+    return Y
 
 class TSNE(object):
     """

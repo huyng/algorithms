@@ -8,6 +8,7 @@ class NDPoint(object):
     """
     A point in n-dimensional space
     """
+
     def __init__(self, x, idx=None):
         self.x = np.array(x)
         self.idx = idx
@@ -17,14 +18,14 @@ class NDPoint(object):
 class VPTree(object):
     """
     An efficient data structure to perform nearest-neighbor
-    search over a metric space of n-dimensional points. 
+    search. 
     """
 
     def __init__(self, points, dist_fn=None):
         self.left = None
         self.right = None
         self.mu = None
-        self.dist_fn = dist_fn if dist_fn is not None else euclidean
+        self.dist_fn = dist_fn if dist_fn is not None else l2
 
         # choose a better vantage point selection process
         self.vp = points.pop(random.randrange(len(points)))
@@ -67,13 +68,14 @@ class PriorityQueue(object):
 
 
 ### Distance functions
-def euclidean(p1, p2):
+def l2(p1, p2):
     return np.sqrt(np.sum(np.power(p2.x - p1.x, 2)))
+
 
 ### Operations
 def get_nearest_neighbors(tree, q, k=1):
     """
-    Find k nearest neighbor(s) of q
+    find k nearest neighbor(s) of q
 
     :param tree:  vp-tree
     :param q: a query point
@@ -118,7 +120,7 @@ def get_nearest_neighbors(tree, q, k=1):
 
 def get_all_in_range(tree, q, tau):
     """
-    Find all points within a given radius of point q
+    find all points within a given radius of point q
 
     :param tree: vp-tree
     :param q: a query point
@@ -128,7 +130,7 @@ def get_all_in_range(tree, q, tau):
     # buffer for nearest neightbors
     neighbors = []
 
-    # list of nodes to visit
+    # list of nodes ot visit
     visit_stack = deque([tree])
 
     while len(visit_stack) > 0:
@@ -158,11 +160,17 @@ def get_all_in_range(tree, q, tau):
 
 
 if __name__ == '__main__':
-    X = np.random.uniform(0, 100000, size=40000)
-    Y = np.random.uniform(0, 100000, size=40000)
+    X = np.random.uniform(0, 100000, size=10000)
+    Y = np.random.uniform(0, 100000, size=10000)
     points = [NDPoint(x,i) for i, x in  enumerate(zip(X,Y))]
     tree = VPTree(points)
     q = NDPoint([300,300])
     neighbors = get_nearest_neighbors(tree, q, 5)
-    for n in neighbors:
-        print n
+
+    print "query:"
+    print "\t", q
+    print "nearest neighbors: "
+    for d, n in neighbors:
+        print "\t", n
+
+    

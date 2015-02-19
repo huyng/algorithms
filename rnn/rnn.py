@@ -1,6 +1,7 @@
 """
 A vanilla RNN
 """
+
 import numpy as np
 import theano.tensor as T
 import theano
@@ -66,6 +67,39 @@ def recurrent_fn(u_t, h_tm1):
 (h, y_predict), _ = theano.scan(recurrent_fn, 
                                 sequences = x,
                                 outputs_info = [h0, None])
+
+
+L1 = abs(W_uh.sum()) + abs(W_hh.sum()) + abs(W_hy.sum())
+L2sq = (W_uh ** 2).sum() + (W_hh ** 2).sum() + (W_hy ** 2).sum()
+
+# use mean squared error loss
+loss = lambda y: T.mean(y_predict - y) ** 2
+y = T.matrix(name = 'y', dtype = theano.config.floatX)
+cost = loss(y) + L1_reg * L1 + L2_reg * L2sq
+index = T.lscalar('index')
+lr = T.scalar('lr', dtype = theano.config.floatX) 
+mom = T.scalar('mom', dtype = theano.config.floatX) 
+
+t = np.arange(300)
+train_set_x = .5 * np.sin(t/2)
+train_set_y = np.asarray(x[1:] + [1])
+
+training_error = theano.function(inputs=[index],
+                                 outputs = loss(y),
+                                 givens = {
+                                    x: train_set_x[index],
+                                    y: train_set_y[index],
+                                 },
+                                 mode = "cvm")
+
+param_grads = []
+for param in params:
+    param_grads.append(T.grad(cost, param))
+
+
+
+
+
 
 
 

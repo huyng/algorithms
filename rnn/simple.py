@@ -76,9 +76,7 @@ for param in parameters:
 
 
 # create a function that performs a single gradient descent step on training data
-def generate_learner(x_train, 
-                     y_train,
-                     param_updates):
+def generate_learner(x_train, y_train, param_updates):
 
     index = T.lscalar('index')
     learner_fn = theano.function(

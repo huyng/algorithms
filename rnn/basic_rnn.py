@@ -64,14 +64,12 @@ loss =  T.mean(y_predict - y) ** 2
 cost = loss
 
 
+# symbolically generate the derivative of the cost 
+# w.r.t the parameters (AKA the gradient), and the updates to each param
 param_updates = []
 for param in parameters:
-    # symbolically generate the derivative of the cost w.r.t the parameters (AKA the gradient)
     gradient = T.grad(cost, param)
-
-    # symbolically generate an a gradient update for given parameter
     update = param - learning_rate*gradient
-
     param_updates.append((param, update))
 
 # create a function that performs a single gradient descent step on training data

@@ -7,16 +7,6 @@ import theano.tensor as T
 import theano
 import datasets
 
-# ======
-# Config
-# ======
-
-# theano.config.exception_verbosity="high"
-# theano.config.optimizer='fast_compile'
-# theano.config.compute_test_value='off'
-
-
-
 # ============
 # Create model
 # ============
@@ -84,7 +74,6 @@ for param in parameters:
 
     param_updates.append((param, update))
 
-
 # create a function that performs a single gradient descent step on training data
 def make_learner(x_train, y_train, param_updates):
 
@@ -102,14 +91,11 @@ def make_learner(x_train, y_train, param_updates):
     return learner_fn
 
 
-def train():
+def train(x_train_val, y_train_val):
 
-    # generate some simple training data
-    n_samples = 100
-    timesteps = 20
-    x_train_val, y_train_val = datasets.sinewaves(timesteps, n=n_samples)
     x_train = theano.shared(x_train_val)
     y_train = theano.shared(y_train_val)
+    n_samples = x_train_val.shape[0]
 
     # creating training function
     learn_fn = make_learner(x_train, y_train, param_updates)
@@ -117,12 +103,20 @@ def train():
     # start gradient descent w/ batch_size==1
     max_epochs = 1000
     for epoch in range(max_epochs):
-        computed_costs = []
+        costs = []
         for idx in range(n_samples):
             example_cost = learn_fn(idx, 0.5)
-            computed_costs.append(example_cost[0])
-        print "epoch=%i -- cost=%0.8f" % (epoch, np.mean(computed_costs))
+            costs.append(example_cost[0])
+        print "epoch=%i -- cost=%0.8f" % (epoch, np.mean(costs))
 
+  
+def main():
+    # generate some simple training data
+    n_samples = 100
+    timesteps = 20
+    x_train_val, y_train_val = datasets.sinewaves(timesteps, n=n_samples)
+
+    train(x_train_val, y_train_val)
 
 if __name__ == '__main__':
-    train()
+    main()

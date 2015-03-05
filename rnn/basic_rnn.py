@@ -1,5 +1,5 @@
 """
-A vanilla RNN
+A super bare bones rnn
 """
 
 import numpy as np

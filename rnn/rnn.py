@@ -20,7 +20,7 @@ momentum_switchover = 10
 n_epochs = 100
 
 
-x = T.matrix(name = 'x', dtype = theano.config.floatX)
+x = T.matrix(name='x', dtype = theano.config.floatX)
 W_uh = theano.shared(value = np.asarray(np.random.uniform(
                                 size = (n_u, n_h),
                                 low = -.01, 
@@ -33,14 +33,14 @@ W_hh = theano.shared(value = np.asarray(np.random.uniform(
                                 low = -.01, 
                                 high = .01),
                               dtype = theano.config.floatX),
-                    name = "W_hh")
+                     name = "W_hh")
 
 W_hy = theano.shared(value = np.asarray(np.random.uniform(
                                 size = (n_h, n_y),
                                 low = -.01, 
                                 high = .01),
                              dtype = theano.config.floatX),
-                    name = "W_hy")
+                     name = "W_hy")
 
 # biases initialized to zeros
 b_h = theano.shared(value=np.zeros((n_h,), dtype=theano.config.floatX))

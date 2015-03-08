@@ -6,6 +6,7 @@ import numpy as np
 import theano.tensor as T
 import theano
 import datasets
+import debugger
 from numpy.random import uniform
 from theano import config
 
@@ -14,7 +15,6 @@ from theano import config
 # ======
 
 # theano.config.mode='FAST_COMPILE'
-
 # theano.config.exception_verbosity="high"
 # theano.config.compute_test_value='off'
 
@@ -111,14 +111,6 @@ def make_predictor():
         )
     return predict_fn
 
-def report(d):
-    import json
-    with open("learning_curve.txt", "a") as fh:
-        fh.write(json.dumps(d))
-        fh.write("\n")
-    print "epoch=%-6s -- trn_cost=%0.8f tst_cost=%0.8f" % (d['_epoch'], d['trn'], d['tst'])
-
-
 
 def train(x_train_val, y_train_val, x_test_val, y_test_val):
     x_train = theano.shared(x_train_val)
@@ -130,7 +122,7 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
     learn_fn, test_fn = make_learner(x_train, y_train, param_updates)
 
     # start gradient descent w/ batch_size==1
-    max_epochs = 1000
+    max_epochs = 2
     lr_val = 0.5
     for epoch in range(max_epochs):
         train_costs = []
@@ -144,13 +136,37 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
             sample_cost = test_fn(x_test_val[idx], y_test_val[idx])
             test_costs.append(sample_cost)
 
-
         report({
             '_epoch':epoch,
             'trn':np.mean(train_costs),
             'tst':np.mean(test_costs)
         })
 
+
+
+
+# ==============
+# Infrastructure
+# ==============
+
+def save_parameters():
+    d = {}
+    for p in parameters:
+        k = p.name
+        d[k] = p.get_value(borrow=False)
+    np.savez("weights.npz", **d)
+
+def load_parameters():
+    f = np.load("weights.npz")
+    for p in parameters:
+        p.set_value(f[p.name])
+
+def report(d):
+    import json
+    with open("learning_curve.txt", "a") as fh:
+        fh.write(json.dumps(d))
+        fh.write("\n")
+    print "epoch=%-6s -- trn_cost=%0.8f tst_cost=%0.8f" % (d['_epoch'], d['trn'], d['tst'])
 
 
 
@@ -161,5 +177,7 @@ if __name__ == '__main__':
     x_train_val, y_train_val = datasets.sinewaves(timesteps, n=n_samples)
     x_test_val, y_test_val = datasets.sinewaves(timesteps, n=20)
     train(x_train_val, y_train_val, x_test_val, y_test_val)
-    predictor = make_predictor()
+
+
+
 

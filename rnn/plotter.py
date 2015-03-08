@@ -9,10 +9,11 @@ from collections import defaultdict
 parser = ap.ArgumentParser()
 parser.add_argument("file", type=str)
 
+
 def fsource(fpath):
     with open(fpath) as fh:
-        while True:
-            line = fh.readline()
+
+        for line in fh:
             if not line.strip():
                 continue
             try:
@@ -21,12 +22,25 @@ def fsource(fpath):
                 pass
             yield data_dict
 
-def main(args):
+
+def run(args):
     data = defaultdict(list)
-    for key, val in fsource(args.file):
-        data[key].append(val)
+    for d in fsource(args.file):
+        p.clf()
+        for key, val in d.items():
+            if key.startswith("_"):
+                continue
+            data[key].append(val)
+
+    for key in d.keys():
         p.plot(data[key])
-        p.show(block=False)
+
+    p.show(block=False)
+    raw_input("press enter")
+
+def main(args):
+    while True:
+        run(args)
 
 if __name__ == '__main__':
     args = parser.parse_args()

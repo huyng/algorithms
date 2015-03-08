@@ -123,8 +123,8 @@ def train(x_train_val, y_train_val):
     for epoch in range(max_epochs):
         costs = []
         for idx in range(n_samples):
-            example_cost = learn_fn(idx, lr_val)
-            costs.append(example_cost[0])
+            sample_cost = learn_fn(idx, lr_val)
+            costs.append(sample_cost[0])
 
         print "epoch=%-6s -- cost=%0.8f" % (epoch, np.mean(costs))
 

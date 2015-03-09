@@ -33,9 +33,10 @@ def run(args):
             data[key].append(val)
 
     for key in d.keys():
-        p.plot(data[key])
+        p.plot(data[key], label=key)
 
-    p.show(block=False)
+    p.legend()
+    p.show(block=True)
     raw_input("press enter")
 
 def main(args):

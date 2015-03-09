@@ -71,7 +71,13 @@ def step(x_t, h_tm1):
 
 lr = T.scalar('lr', dtype=theano.config.floatX)
 loss =  T.mean(y_predict - y) ** 2
-cost = loss
+L1 = abs(W_xh.sum()) + abs(W_hh.sum())  + abs(W_hy.sum()) 
+L2 = (W_xh**2).sum() + (W_hh**2).sum() + (W_hy**2).sum()
+L1_reg = 1.0
+L2_reg = 1.0
+
+cost = loss + L1_reg*L1 + L2_reg+L2
+
 
 
 # symbolically generate the derivative of the cost

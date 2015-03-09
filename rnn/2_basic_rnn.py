@@ -73,8 +73,8 @@ lr = T.scalar('lr', dtype=theano.config.floatX)
 loss =  T.mean(y_predict - y) ** 2
 L1 = abs(W_xh.sum()) + abs(W_hh.sum())  + abs(W_hy.sum()) 
 L2 = (W_xh**2).sum() + (W_hh**2).sum() + (W_hy**2).sum()
-L1_reg = 1.0
-L2_reg = 1.0
+L1_reg = 0.0
+L2_reg = 0.0
 
 cost = loss + L1_reg*L1 + L2_reg+L2
 
@@ -86,6 +86,7 @@ cost = loss + L1_reg*L1 + L2_reg+L2
 param_updates = []
 for param in parameters:
     gradient = T.grad(cost, param)
+    gradient = theano.printing.Print("d(%s)" % param.name)(gradient)
     update = param - lr*gradient
     param_updates.append((param, update))
 
@@ -177,7 +178,7 @@ if __name__ == '__main__':
     import uuid
     run_name = uuid.uuid4().hex[:8]
     n_samples = 1000
-    timesteps = 20
+    timesteps = 1
     x_train_val, y_train_val = datasets.sinewaves(timesteps, n=n_samples)
     x_test_val, y_test_val = datasets.sinewaves(timesteps, n=20)
     train(x_train_val, y_train_val, x_test_val, y_test_val)

@@ -8,6 +8,10 @@ from collections import defaultdict
 
 parser = ap.ArgumentParser()
 parser.add_argument("file", type=str)
+parser.add_argument("--port", default=8080, type=int)
+parser.add_argument("--host", default="0.0.0.0", type=str)
+parser.add_argument("--debug", default=False, type=bool)
+
 
 
 def fsource(fpath):
@@ -24,6 +28,7 @@ def fsource(fpath):
 
 
 def run(args):
+    from StringIO import StringIO
     data = defaultdict(list)
     for d in fsource(args.file):
         p.clf()
@@ -36,12 +41,30 @@ def run(args):
         p.plot(data[key], label=key)
 
     p.legend()
-    p.show(block=True)
-    raw_input("press enter")
+    buf = StringIO()
+    p.savefig(buf, format='png')
+    buf.seek(0)
+    return buf.read()
+
+
+
+    
+
+
+from flask import Flask
+from flask import make_response
+app = Flask(__name__)
+@app.route('/')
+def index():
+    image = run(args)
+    response = make_response(image)
+    response.headers['Content-Type'] = 'image/jpeg'
+    # response.headers['Content-Disposition'] = 'attachment; filename=img.jpg'
+    return response
+
 
 def main(args):
-    while True:
-        run(args)
+    app.run(debug=True, host=args.host, port=args.port)
 
 if __name__ == '__main__':
     args = parser.parse_args()

@@ -40,6 +40,8 @@ def run(args):
     for key in d.keys():
         p.plot(data[key], label=key)
 
+    p.xlabel("epoch")
+    p.ylabel("cost")
     p.legend()
     buf = StringIO()
     p.savefig(buf, format='png')

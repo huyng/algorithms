@@ -5,6 +5,7 @@ import time
 import argparse as ap
 import json
 from collections import defaultdict
+from StringIO import StringIO
 
 parser = ap.ArgumentParser()
 parser.add_argument("file", type=str)
@@ -28,7 +29,6 @@ def fsource(fpath):
 
 
 def run(args):
-    from StringIO import StringIO
     data = defaultdict(list)
     for d in fsource(args.file):
         p.clf()
@@ -60,13 +60,27 @@ app = Flask(__name__)
 def index():
     image = run(args)
     response = make_response(image)
-    response.headers['Content-Type'] = 'image/jpeg'
+    response.headers['Content-Type'] = 'image/png'
     # response.headers['Content-Disposition'] = 'attachment; filename=img.jpg'
     return response
 
 
+def webplot(context, path="/", host="127.0.0.1", port=8080):
+    newapp = Flask(__name__)
+    @newapp.route(path)
+    def dynamic():
+        buf = StringIO()
+        context.savefig(buf, format='png')
+        buf.seek(0)
+        response = make_response(buf.read())
+        response.headers['Content-Type'] = 'image/png'
+        return response
+    newapp.run(port=port, host=host)
+
+
+
 def main(args):
-    app.run(debug=True, host=args.host, port=args.port)
+    app.run(debug=args.debug, host=args.host, port=args.port)
 
 if __name__ == '__main__':
     args = parser.parse_args()

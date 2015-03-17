@@ -75,7 +75,7 @@ def step(x_t, h_tm1):
 [h, y_predict], _ = theano.scan(step, sequences=x, outputs_info=[h0, None], n_steps=n_steps)
 
 lr = T.scalar('lr', dtype=theano.config.floatX)
-loss =  T.mean(y_predict - y) ** 2
+loss =  T.mean((y_predict - y) ** 2)
 L1 = abs(W_xh.sum()) + abs(W_hh.sum())  + abs(W_hy.sum()) 
 L2 = (W_xh**2).sum() + (W_hh**2).sum() + (W_hy**2).sum()
 L1_reg = 0.0

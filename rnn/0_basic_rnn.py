@@ -70,7 +70,7 @@ def step(x_t, h_tm1):
 [h, y_predict], _ = theano.scan(step, sequences=x, outputs_info=[h0, None])
 
 lr = T.scalar('lr', dtype=theano.config.floatX)
-loss =  T.mean(y_predict - y) ** 2
+loss =  T.mean((y_predict - y) ** 2)
 cost = loss
 
 

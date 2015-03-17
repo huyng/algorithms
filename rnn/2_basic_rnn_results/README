@@ -1,0 +1,5 @@
+git commit: 2ccebed
+
+trainin_example_prediction.png was generated from running
+
+    predict(x_train_val[0])

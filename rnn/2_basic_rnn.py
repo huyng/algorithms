@@ -10,6 +10,7 @@ import os
 import datasets
 from numpy.random import uniform
 from theano import config
+
 # p = sys.stderr.write
 # sys.stdout = open(os.devnull, "w")
 
@@ -131,32 +132,27 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
 
     # creating training and test function
     learn_fn, test_fn = make_learner(x_train, y_train, param_updates)
-    predict_fn = make_predictor()
 
     # start gradient descent w/ batch_size==1
     max_epochs = 10000
     lr_val = 0.001
     for epoch in range(max_epochs):
         train_costs = []
-        test_costs = []
         for idx in range(n_train_samples):
             sample_cost = learn_fn(idx, lr_val)
-            b = predict_fn(x_train_val[idx])
-            print("b=%s\n" % b)
-            print("y=%s\n" % y_train_val[idx])
-            print("x=%s\n" % x_train_val[idx])
             train_costs.append(sample_cost[0])
             report({'trn': np.mean(sample_cost), '_epoch':epoch, 'tst': 0})
 
-        # for idx in range(n_test_samples):
-        #     sample_cost = test_fn(x_test_val[idx], y_test_val[idx])
-        #     test_costs.append(sample_cost)
+        test_costs = []
+        for idx in range(n_test_samples):
+            sample_cost = test_fn(x_test_val[idx], y_test_val[idx])
+            test_costs.append(sample_cost)
 
-        # report({
-        #     '_epoch':epoch,
-        #     'trn':np.mean(train_costs),
-        #     'tst':np.mean(test_costs)
-        # })
+        report({
+            '_epoch':epoch,
+            'trn':np.mean(train_costs),
+            'tst':np.mean(test_costs)
+        })
 
 
 # ==============

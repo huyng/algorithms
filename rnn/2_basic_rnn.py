@@ -28,7 +28,7 @@ theano.config.floatX = 'float32'
 # Create model
 # ============
 n_x = 1   # input activations size for a single time step
-n_h = 100   # hidden activations size for a single time step
+n_h = 10   # hidden activations size for a single time step
 n_y = 1   # output activation size for a single time step
 n_steps = 3
 
@@ -135,7 +135,7 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
 
     # start gradient descent w/ batch_size==1
     max_epochs = 10000
-    lr_val = 0.01
+    lr_val = 0.1
     for epoch in range(max_epochs):
         train_costs = []
         for idx in range(n_train_samples):
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     # generate some simple training data
     import uuid
     run_name = uuid.uuid4().hex[:8]
-    n_samples = 100
+    n_samples = 1
     x_train_val, y_train_val = datasets.sinewaves(n_steps, n=n_samples)
     x_test_val, y_test_val = datasets.sinewaves(n_steps, n=20)
     train(x_train_val, y_train_val, x_test_val, y_test_val)

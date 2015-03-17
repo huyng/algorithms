@@ -150,8 +150,8 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
 
         report({
             '_epoch':epoch,
-            'trn':np.mean(train_costs),
-            'tst':np.mean(test_costs)
+            'trn': float(np.mean(train_costs)),
+            'tst': float(np.mean(test_costs))
         })
 
 

@@ -28,7 +28,7 @@ theano.config.floatX = 'float32'
 # Create model
 # ============
 n_x = 1   # input activations size for a single time step
-n_h = 2   # hidden activations size for a single time step
+n_h = 100   # hidden activations size for a single time step
 n_y = 1   # output activation size for a single time step
 n_steps = 3
 

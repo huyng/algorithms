@@ -1,4 +1,5 @@
 import numpy as np
+from  theano import config
 
 def sinewaves(timesteps, n):
     """
@@ -14,9 +15,9 @@ def sinewaves(timesteps, n):
 
     """
     
-    t = np.arange(timesteps)
-    frequency_weights = np.random.random(n)
-    amplitude_weights = np.random.random(n)
+    t = np.arange(timesteps).astype(config.floatX)
+    frequency_weights = np.random.random(n).astype(config.floatX)
+    amplitude_weights = np.random.random(n).astype(config.floatX)
     t_scaled = frequency_weights[:, np.newaxis] * t
     x_train = amplitude_weights[:, np.newaxis] * np.sin(t_scaled)
     y_train = np.roll(x_train, -1, axis=1)

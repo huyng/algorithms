@@ -2,12 +2,16 @@
 A vanilla RNN
 """
 
+import sys
 import numpy as np
 import theano.tensor as T
 import theano
+import os
 import datasets
 from numpy.random import uniform
 from theano import config
+# p = sys.stderr.write
+# sys.stdout = open(os.devnull, "w")
 
 # ======
 # Config
@@ -16,21 +20,22 @@ from theano import config
 # theano.config.mode='FAST_COMPILE'
 # theano.config.exception_verbosity="high"
 # theano.config.compute_test_value='off'
-
+theano.config.floatX = 'float32'
 
 
 # ============
 # Create model
 # ============
 n_x = 1   # input activations size for a single time step
-n_h = 3  # hidden activations size for a single time step
+n_h = 2   # hidden activations size for a single time step
 n_y = 1   # output activation size for a single time step
+n_steps = 3
 
 
 # inputs/outputs
 # ==============
-x = T.matrix(name='x')
-y = T.matrix(name='y')
+x = T.matrix(name='x', dtype=config.floatX)
+y = T.matrix(name='y', dtype=config.floatX)
 
 
 # parameters
@@ -67,7 +72,7 @@ def step(x_t, h_tm1):
     y_t = T.dot(h_t, W_hy) + b_y
     return (h_t, y_t)
 
-[h, y_predict], _ = theano.scan(step, sequences=x, outputs_info=[h0, None])
+[h, y_predict], _ = theano.scan(step, sequences=x, outputs_info=[h0, None], n_steps=n_steps)
 
 lr = T.scalar('lr', dtype=theano.config.floatX)
 loss =  T.mean(y_predict - y) ** 2
@@ -76,7 +81,7 @@ L2 = (W_xh**2).sum() + (W_hh**2).sum() + (W_hy**2).sum()
 L1_reg = 0.0
 L2_reg = 0.0
 
-cost = loss + L1_reg*L1 + L2_reg+L2
+cost = loss
 
 
 
@@ -86,7 +91,7 @@ cost = loss + L1_reg*L1 + L2_reg+L2
 param_updates = []
 for param in parameters:
     gradient = T.grad(cost, param)
-    gradient = theano.printing.Print("d(%s)" % param.name)(gradient)
+    # gradient = theano.printing.Print("d(%s)" % param.name)(gradient)
     update = param - lr*gradient
     param_updates.append((param, update))
 
@@ -114,7 +119,6 @@ def make_predictor():
     predict_fn = theano.function(
             inputs=[x],
             outputs=[y_predict],
-            mode=theano.Mode(linker='cvm')
         )
     return predict_fn
 
@@ -127,26 +131,32 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
 
     # creating training and test function
     learn_fn, test_fn = make_learner(x_train, y_train, param_updates)
+    predict_fn = make_predictor()
 
     # start gradient descent w/ batch_size==1
-    max_epochs = 1000
+    max_epochs = 10000
     lr_val = 0.001
     for epoch in range(max_epochs):
         train_costs = []
         test_costs = []
         for idx in range(n_train_samples):
             sample_cost = learn_fn(idx, lr_val)
+            b = predict_fn(x_train_val[idx])
+            print("b=%s\n" % b)
+            print("y=%s\n" % y_train_val[idx])
+            print("x=%s\n" % x_train_val[idx])
             train_costs.append(sample_cost[0])
+            report({'trn': np.mean(sample_cost), '_epoch':epoch, 'tst': 0})
 
-        for idx in range(n_test_samples):
-            sample_cost = test_fn(x_test_val[idx], y_test_val[idx])
-            test_costs.append(sample_cost)
+        # for idx in range(n_test_samples):
+        #     sample_cost = test_fn(x_test_val[idx], y_test_val[idx])
+        #     test_costs.append(sample_cost)
 
-        report({
-            '_epoch':epoch,
-            'trn':np.mean(train_costs),
-            'tst':np.mean(test_costs)
-        })
+        # report({
+        #     '_epoch':epoch,
+        #     'trn':np.mean(train_costs),
+        #     'tst':np.mean(test_costs)
+        # })
 
 
 # ==============
@@ -177,10 +187,9 @@ if __name__ == '__main__':
     # generate some simple training data
     import uuid
     run_name = uuid.uuid4().hex[:8]
-    n_samples = 1000
-    timesteps = 1
-    x_train_val, y_train_val = datasets.sinewaves(timesteps, n=n_samples)
-    x_test_val, y_test_val = datasets.sinewaves(timesteps, n=20)
+    n_samples = 1
+    x_train_val, y_train_val = datasets.sinewaves(n_steps, n=n_samples)
+    x_test_val, y_test_val = datasets.sinewaves(n_steps, n=20)
     train(x_train_val, y_train_val, x_test_val, y_test_val)
 
 

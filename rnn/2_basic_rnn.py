@@ -135,7 +135,7 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
 
     # start gradient descent w/ batch_size==1
     max_epochs = 10000
-    lr_val = 0.001
+    lr_val = 0.01
     for epoch in range(max_epochs):
         train_costs = []
         for idx in range(n_train_samples):

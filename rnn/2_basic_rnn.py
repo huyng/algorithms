@@ -141,7 +141,6 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
         for idx in range(n_train_samples):
             sample_cost = learn_fn(idx, lr_val)
             train_costs.append(sample_cost[0])
-            report({'trn': np.mean(sample_cost), '_epoch':epoch, 'tst': 0})
 
         test_costs = []
         for idx in range(n_test_samples):
@@ -183,7 +182,7 @@ if __name__ == '__main__':
     # generate some simple training data
     import uuid
     run_name = uuid.uuid4().hex[:8]
-    n_samples = 1
+    n_samples = 100
     x_train_val, y_train_val = datasets.sinewaves(n_steps, n=n_samples)
     x_test_val, y_test_val = datasets.sinewaves(n_steps, n=20)
     train(x_train_val, y_train_val, x_test_val, y_test_val)

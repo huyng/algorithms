@@ -28,11 +28,11 @@ theano.config.floatX = 'float32'
 # Create model
 # ============
 n_x = 1      # input activations size for a single time step
-n_h = 10     # hidden activations size for a single time step
+n_h = 64     # hidden activations size for a single time step
 n_y = 1      # output activation size for a single time step
 
 # http://www.schraudolph.org/pubs/GerSchSch02.pdf (mentions 10 time steps already a big problem for Simple RNNs)
-n_steps = 7 # number of timesteps
+n_steps = 8 # number of timesteps
 
 
 # inputs/outputs

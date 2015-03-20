@@ -27,10 +27,12 @@ theano.config.floatX = 'float32'
 # ============
 # Create model
 # ============
-n_x = 1    # input activations size for a single time step
-n_h = 10   # hidden activations size for a single time step
-n_y = 1    # output activation size for a single time step
-n_steps = 3
+n_x = 1      # input activations size for a single time step
+n_h = 10     # hidden activations size for a single time step
+n_y = 1      # output activation size for a single time step
+
+# http://www.schraudolph.org/pubs/GerSchSch02.pdf (mentions 10 time steps already a big problem for Simple RNNs)
+n_steps = 7 # number of timesteps
 
 
 # inputs/outputs
@@ -81,7 +83,6 @@ L1 = abs(W_xh.sum()) + abs(W_hh.sum())  + abs(W_hy.sum())
 L2 = (W_xh**2).sum() + (W_hh**2).sum() + (W_hy**2).sum()
 L1_reg = 0.0
 L2_reg = 0.0
-
 cost = loss
 
 
@@ -135,16 +136,13 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
 
     # start gradient descent w/ batch_size==1
     max_epochs = 10000
-    lr_val = 0.1
-    lr_decay = 0.99
+    lr_val = 0.1 # http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf
 
     for epoch in range(max_epochs):
         train_costs = []
         for idx in range(n_train_samples):
             sample_cost = learn_fn(idx, lr_val)
             train_costs.append(sample_cost[0])
-
-        lr_val = lr_val * lr_decay
 
         test_costs = []
         for idx in range(n_test_samples):
@@ -157,19 +155,26 @@ def train(x_train_val, y_train_val, x_test_val, y_test_val):
             'tst': float(np.mean(test_costs))
         })
 
+        # checkpoint parameters every 1000 epochs
+        if epoch % 1000 == 0:
+            save_parameters(epoch)
+
+
 
 # ==============
 # Infrastructure
 # ==============
-def save_parameters():
+def save_parameters(epoch=None):
     d = {}
+    fname = "weights.npz" if epoch is None else "weights.%d.npz" % epoch
     for p in parameters:
         k = p.name
         d[k] = p.get_value(borrow=False)
-    np.savez("weights.npz", **d)
+    np.savez(fname, **d)
 
-def load_parameters():
-    f = np.load("weights.npz")
+def load_parameters(epoch=None):
+    fname = "weights.npz" if epoch is None else "weights.%d.npz" % epoch
+    f = np.load(fname)
     for p in parameters:
         p.set_value(f[p.name])
 
@@ -181,12 +186,11 @@ def report(d):
     print "epoch=%-6s -- trn_cost=%0.8f tst_cost=%0.8f" % (d['_epoch'], d['trn'], d['tst'])
 
 
-
 if __name__ == '__main__':
     # generate some simple training data
     import uuid
     run_name = uuid.uuid4().hex[:8]
-    n_samples = 1
+    n_samples = 10000
     x_train_val, y_train_val = datasets.sinewaves(n_steps, n=n_samples)
     x_test_val, y_test_val = datasets.sinewaves(n_steps, n=20)
     train(x_train_val, y_train_val, x_test_val, y_test_val)

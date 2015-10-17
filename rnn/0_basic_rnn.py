@@ -1,11 +1,23 @@
 """
-A super bare bones rnn
+A vanilla RNN
 """
 
 import numpy as np
 import theano.tensor as T
 import theano
 import datasets
+from numpy.random import uniform
+from theano import config
+
+# ======
+# Config
+# ======
+
+# theano.config.exception_verbosity="high"
+# theano.config.optimizer='fast_compile'
+# theano.config.compute_test_value='off'
+
+
 
 # ============
 # Create model
@@ -25,12 +37,12 @@ y = T.matrix(name='y')
 # ==========
 
 # concrete values
-W_xh_val = np.asarray(np.random.uniform(size=(n_x, n_h), low=-.01, high=.01))
-W_hh_val = np.asarray(np.random.uniform(size=(n_h, n_h), low=-.01, high=.01))
-W_hy_val = np.asarray(np.random.uniform(size=(n_h, n_y), low=-.01, high=.01))
-b_h_val = np.zeros((n_h,), dtype=theano.config.floatX)
-b_y_val = np.zeros((n_y,), dtype=theano.config.floatX)
-h0_val = np.zeros((n_h,), dtype= theano.config.floatX)
+W_xh_val = np.asarray(uniform(size=(n_x, n_h), low=-.01, high=.01), dtype=config.floatX)
+W_hh_val = np.asarray(uniform(size=(n_h, n_h), low=-.01, high=.01), dtype=config.floatX)
+W_hy_val = np.asarray(uniform(size=(n_h, n_y), low=-.01, high=.01), dtype=config.floatX)
+b_h_val = np.zeros((n_h,), dtype=config.floatX)
+b_y_val = np.zeros((n_y,), dtype=config.floatX)
+h0_val = np.zeros((n_h,), dtype=config.floatX)
 
 # symbolic
 W_xh = theano.shared(value=W_xh_val, name="W_xh")
@@ -57,25 +69,27 @@ def step(x_t, h_tm1):
 
 [h, y_predict], _ = theano.scan(step, sequences=x, outputs_info=[h0, None])
 
-learning_rate = T.scalar('learning_rate', dtype=theano.config.floatX)
-loss =  T.mean(y_predict - y) ** 2
+lr = T.scalar('lr', dtype=theano.config.floatX)
+loss =  T.mean((y_predict - y) ** 2)
 cost = loss
 
 
-# symbolically generate the derivative of the cost 
-# w.r.t the parameters (AKA the gradient), and the updates to each param
+# symbolically generate the derivative of the cost
+# w.r.t the parameters (AKA the gradient) and the 
+# updates for each parameter
 param_updates = []
 for param in parameters:
     gradient = T.grad(cost, param)
-    update = param - learning_rate*gradient
+    update = param - lr*gradient
     param_updates.append((param, update))
+
 
 # create a function that performs a single gradient descent step on training data
 def make_learner(x_train, y_train, param_updates):
 
     index = T.lscalar('index')
     learner_fn = theano.function(
-            inputs=[index, learning_rate],
+            inputs=[index, lr],
             outputs=[cost],
             updates=param_updates,
             givens={
@@ -89,13 +103,13 @@ def make_learner(x_train, y_train, param_updates):
 def make_predictor():
     predict_fn = theano.function(
             inputs=[x],
-            outputs=[y_predict, h],
+            outputs=[y_predict],
         )
     return predict_fn
 
 
-def train(x_train_val, y_train_val):
 
+def train(x_train_val, y_train_val):
     x_train = theano.shared(x_train_val)
     y_train = theano.shared(y_train_val)
     n_samples = x_train_val.shape[0]
@@ -105,17 +119,22 @@ def train(x_train_val, y_train_val):
 
     # start gradient descent w/ batch_size==1
     max_epochs = 1000
+    lr_val = 0.5
     for epoch in range(max_epochs):
         costs = []
         for idx in range(n_samples):
-            example_cost = learn_fn(idx, 0.5)
-            costs.append(example_cost[0])
-        print "epoch=%-5s -- cost=%0.8f" % (epoch, np.mean(costs))
+            sample_cost = learn_fn(idx, lr_val)
+            costs.append(sample_cost[0])
+
+        print "epoch=%-6s -- cost=%0.8f" % (epoch, np.mean(costs))
+
+
 
 if __name__ == '__main__':
+    # generate some simple training data
     n_samples = 100
     timesteps = 20
     x_train_val, y_train_val = datasets.sinewaves(timesteps, n=n_samples)
-
     train(x_train_val, y_train_val)
+    predictor = make_predictor()
 

@@ -45,13 +45,11 @@ parameters = [W_xh, W_hh, W_hy, b_h, b_y, h0]
 
 # training model
 # ==============
-
 def step(x_t, h_tm1):
     """
     This is a function representing a single time step of the 
     recurrent neural net
     """
-
     g_t = T.dot(x_t, W_xh) + T.dot(h_tm1, W_hh) + b_h
     h_t = T.tanh(g_t)
     y_t = T.dot(h_t, W_hy) + b_y
@@ -88,6 +86,13 @@ def make_learner(x_train, y_train, param_updates):
 
     return learner_fn
 
+def make_predictor():
+    predict_fn = theano.function(
+            inputs=[x],
+            outputs=[y_predict, h],
+        )
+    return predict_fn
+
 
 def train(x_train_val, y_train_val):
 
@@ -107,14 +112,10 @@ def train(x_train_val, y_train_val):
             costs.append(example_cost[0])
         print "epoch=%-5s -- cost=%0.8f" % (epoch, np.mean(costs))
 
-  
-def main():
-    # generate some simple training data
+if __name__ == '__main__':
     n_samples = 100
     timesteps = 20
     x_train_val, y_train_val = datasets.sinewaves(timesteps, n=n_samples)
 
     train(x_train_val, y_train_val)
 
-if __name__ == '__main__':
-    main()

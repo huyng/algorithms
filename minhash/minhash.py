@@ -5,9 +5,9 @@ such that if the description of any two sets
 are equal, we can know how similar the sets are 
 to each other.
 
-                             |A ∪ B|
-P(min(H(A)) = min(H(B)) ) = -------
                              |A ∩ B|
+P(min(H(A)) = min(H(B)) ) = -------
+                             |A ∪ B|
 
 
 - Let x be a member in (A union B)

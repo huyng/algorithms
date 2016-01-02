@@ -55,13 +55,13 @@ h0 = theano.shared(value=h0_val, name="h0")
 parameters = [W_xh, W_hh, W_hy, b_h, b_y, h0]
 
 
-
+# training model
+# ==============
 def step(x_t, h_tm1):
     """
     This is a function representing a single time step of the 
     recurrent neural net
     """
-
     g_t = T.dot(x_t, W_xh) + T.dot(h_tm1, W_hh) + b_h
     h_t = T.tanh(g_t)
     y_t = T.dot(h_t, W_hy) + b_y

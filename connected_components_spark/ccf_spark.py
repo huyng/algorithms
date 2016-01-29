@@ -1,5 +1,5 @@
 """
-This a distributed connected components (union find) implementation for
+This is a distributed connected components (union-find) implementation for
 pyspark based on the following paper.
 
     http://www.cse.unr.edu/~hkardes/pdfs/ccf.pdf
@@ -22,7 +22,14 @@ Usage:
 
     vertices_to_roots = ccf.ccf_run(sc, edges, max_iters=5)
     root_to_children = ccf.ccf_group_by_root(vertices_to_roots)
-    root_to_children.take(10)
+    print root_to_children.take(10)
+
+Expected output:
+
+    [
+        ("a", ["a", "b", "c", "g"]),
+        ("d", ["e", "f"])
+    ]
 
 """
 

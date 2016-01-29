@@ -1,7 +1,0 @@
-# ======
-# Config
-# ======
-
-# theano.config.exception_verbosity="high"
-# theano.config.optimizer='fast_compile'
-# theano.config.compute_test_value='off'

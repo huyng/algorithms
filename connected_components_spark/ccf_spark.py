@@ -1,6 +1,6 @@
 """
-This a distributed connected components implementation for
-spark based on the following paper.
+This a distributed connected components (union find) implementation for
+pyspark based on the following paper.
 
     http://www.cse.unr.edu/~hkardes/pdfs/ccf.pdf
 

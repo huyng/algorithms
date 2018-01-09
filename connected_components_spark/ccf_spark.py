@@ -110,6 +110,6 @@ def ccf_group_by_root(vertex_to_root):
 
         (root_vertex_id, [child_vertex_id1 ... child_vertex_idN])
     """
-    return vertex_to_root.new_edges.map(lambda x: (x[1], x[0]))\
+    return vertex_to_root.map(lambda x: (x[1], x[0]))\
                          .groupByKey()\
                          .mapValues(list)

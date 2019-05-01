@@ -2,7 +2,7 @@
 import numpy as np
 
 trajectories = 1000
-trials = 5
+trials = 20
 bankroll_init = 1000 # dollars
 odds = 2.0
 P_win = .5
@@ -15,6 +15,7 @@ for i in range(trajectories):
     for j in range(trials):
         # bet_frac = .12
         bet_frac = (odds * P_win  - P_lose)/odds
+        bet_size = bet_frac * bankroll_init
         bet_size = bet_frac * bankroll
         won = np.random.uniform() > P_win
 
@@ -37,6 +38,10 @@ ending_bankrolls = np.array(ending_bankrolls)
 outcomes_better_than_start = np.sum(ending_bankrolls > bankroll_init)
 outcomes_worst_than_start = np.sum(ending_bankrolls < bankroll_init)
 outcomes_lost_it_all = np.sum(ending_bankrolls <= 0.0)
+
 print("Better outcome empirical probability: %s" % (outcomes_better_than_start/float(trajectories)))
 print("Worst outcome empirical probability: %s" % (outcomes_worst_than_start/float(trajectories)))
 print("Lost it all empirical probability: %s" % (outcomes_lost_it_all/float(trajectories)))
+print("Median bankroll outcome: %s" % np.median(ending_bankrolls))
+print("Mean bankroll outcome: %s" % np.mean(ending_bankrolls))
+print("STD bankroll outcome: %s" % np.std(ending_bankrolls))
